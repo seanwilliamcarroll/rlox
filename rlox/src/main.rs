@@ -36,8 +36,33 @@ fn run_prompt() {
     }
 }
 
+struct Scanner {
+    original_text: String,
+}
+
+impl Scanner {
+    fn new(text: &String) -> Scanner {
+        Scanner {
+            original_text: text.clone(),
+        }
+    }
+
+    fn scan_tokens(&self) -> Vec<Token> {
+        vec![]
+    }
+}
+
+#[derive(Debug)]
+enum Token {
+    LeftParen,
+    RightParen,
+}
+
 fn run(input: &String) {
-    println!("-----------------------");
-    println!("{}", input);
-    println!("-----------------------");
+    let scanner: Scanner = Scanner::new(input);
+
+    let mut tokens: Vec<Token> = scanner.scan_tokens();
+    for token in &tokens {
+        println!("{:?}", token);
+    }
 }
