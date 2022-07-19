@@ -1,8 +1,12 @@
+use crate::scanner::Scanner;
+use crate::token::Token;
 use std::env;
 use std::fs;
 use std::io;
 use std::io::Write;
 use std::process;
+pub mod scanner;
+pub mod token;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -29,40 +33,24 @@ fn run_prompt() {
         let mut line = String::new();
         print!("> ");
         io::stdout().flush().unwrap();
-        let num_bytes = io::stdin()
+        let _num_bytes = io::stdin()
             .read_line(&mut line)
             .expect("Error reading user input line");
         run(&line);
     }
 }
 
-struct Scanner {
-    original_text: String,
-}
+// fn report(line:i32, )
 
-impl Scanner {
-    fn new(text: &String) -> Scanner {
-        Scanner {
-            original_text: text.clone(),
-        }
-    }
-
-    fn scan_tokens(&self) -> Vec<Token> {
-        vec![]
-    }
-}
-
-#[derive(Debug)]
-enum Token {
-    LeftParen,
-    RightParen,
-}
+// fn error(line: i32, message: &String) {
+//     report(line, "".to_owned(), message);
+// }
 
 fn run(input: &String) {
-    let scanner: Scanner = Scanner::new(input);
+    let mut scanner: Scanner = Scanner::new(input);
 
-    let mut tokens: Vec<Token> = scanner.scan_tokens();
-    for token in &tokens {
+    let tokens: &Vec<Token> = scanner.scan_tokens();
+    for token in tokens {
         println!("{:?}", token);
     }
 }
