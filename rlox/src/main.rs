@@ -7,6 +7,7 @@ use std::io::Write;
 use std::process;
 pub mod scanner;
 pub mod token;
+pub mod util;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

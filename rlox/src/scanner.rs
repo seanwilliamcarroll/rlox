@@ -1,5 +1,6 @@
 use crate::token::Token;
 use crate::token::TokenType;
+use crate::util;
 
 pub struct Scanner {
     original_text: String,
@@ -10,6 +11,8 @@ pub struct Scanner {
 }
 
 impl Scanner {
+    // SWC: Maybe nice to one day eliminate side effects from a lot of this code
+
     pub fn new(text: &String) -> Scanner {
         Scanner {
             original_text: text.clone(),
@@ -43,16 +46,58 @@ impl Scanner {
         match next_char {
             '(' => self.add_simple_token(TokenType::LeftParen),
             ')' => self.add_simple_token(TokenType::RightParen),
+            '{' => self.add_simple_token(TokenType::LeftBrace),
+            '}' => self.add_simple_token(TokenType::RightBrace),
+            ',' => self.add_simple_token(TokenType::Comma),
+            '.' => self.add_simple_token(TokenType::Dot),
+            '-' => self.add_simple_token(TokenType::Minus),
+            '+' => self.add_simple_token(TokenType::Plus),
+            ';' => self.add_simple_token(TokenType::Semicolon),
+            '*' => self.add_simple_token(TokenType::Star),
+            '!' => {
+                let token_type = if self.match_char('=') {
+                    TokenType::BangEqual
+                } else {
+                    TokenType::Bang
+                };
+                self.add_simple_token(token_type)
+            }
+            '=' => {
+                let token_type = if self.match_char('=') {
+                    TokenType::EqualEqual
+                } else {
+                    TokenType::Equal
+                };
+                self.add_simple_token(token_type)
+            }
             '\n' => self.line += 1,
             '\r' => (),
             ' ' => (),
             '\t' => (),
-            _ => panic!("Unexpected character '{}'", next_char),
+            _ => {
+                let mut message: String = "Unexpected character '".to_owned();
+                message.push(next_char);
+                message.push('\'');
+                util::error(self.line, &message)
+            }
         }
     }
 
+    fn match_char(&mut self, expected: char) -> bool {
+        if self.is_at_end() || self.current_char() != expected {
+            false
+        } else {
+            self.current += 1;
+            true
+        }
+    }
+
+    fn current_char(&self) -> char {
+        self.original_text.chars().nth(self.current).unwrap()
+    }
+
     fn advance(&mut self) -> char {
-        let out_char = self.original_text.chars().nth(self.current).unwrap();
+        let out_char = self.current_char();
         self.current += 1;
         out_char
     }
