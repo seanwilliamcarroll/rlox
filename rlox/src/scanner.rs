@@ -70,6 +70,31 @@ impl Scanner {
                 };
                 self.add_simple_token(token_type)
             }
+            '<' => {
+                let token_type = if self.match_char('=') {
+                    TokenType::LessEqual
+                } else {
+                    TokenType::Less
+                };
+                self.add_simple_token(token_type)
+            }
+            '>' => {
+                let token_type = if self.match_char('=') {
+                    TokenType::GreaterEqual
+                } else {
+                    TokenType::Greater
+                };
+                self.add_simple_token(token_type)
+            }
+            '/' => {
+                if self.match_char('/') {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        let _ = self.advance();
+                    }
+                } else {
+                    self.add_simple_token(TokenType::Slash)
+                }
+            }
             '\n' => self.line += 1,
             '\r' => (),
             ' ' => (),
@@ -80,6 +105,14 @@ impl Scanner {
                 message.push('\'');
                 util::error(self.line, &message)
             }
+        }
+    }
+
+    fn peek(&mut self) -> char {
+        if self.is_at_end() {
+            '\0'
+        } else {
+            self.current_char()
         }
     }
 
