@@ -122,13 +122,13 @@ impl Scanner {
 
         let string_start = self.start + 1;
         let string_end = self.current - 1;
-        let string_lexeme = self
+        let string = self
             .original_text
             .chars()
             .skip(string_start)
             .take(string_end - string_start)
             .collect();
-        self.add_simple_token(TokenType::String(string_lexeme));
+        self.add_simple_token(TokenType::String(string));
     }
 
     fn peek(&mut self) -> char {
