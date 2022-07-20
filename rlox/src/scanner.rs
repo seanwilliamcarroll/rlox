@@ -1,10 +1,9 @@
 use crate::token::Token;
 use crate::token::TokenType;
-use crate::util;
 
 pub struct Scanner {
     original_text: String,
-    tokens: Vec<Token>,
+    tokens: Vec<Result<Token, String>>,
     start: usize,
     current: usize,
     line: usize,
@@ -23,16 +22,13 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token> {
+    pub fn scan_tokens(&mut self) -> &Vec<Result<Token, String>> {
         while !self.is_at_end() {
             self.start = self.current;
             self.scan_token();
         }
-        self.tokens.push(Token::new_simple_token(
-            TokenType::EOF,
-            &"".to_owned(),
-            self.line,
-        ));
+        self.tokens
+            .push(Ok(Token::new(TokenType::EOF, &"".to_owned(), self.line)));
         &self.tokens
     }
 
@@ -95,6 +91,7 @@ impl Scanner {
                     self.add_simple_token(TokenType::Slash)
                 }
             }
+            '"' => self.string(),
             '\n' => self.line += 1,
             '\r' => (),
             ' ' => (),
@@ -103,9 +100,35 @@ impl Scanner {
                 let mut message: String = "Unexpected character '".to_owned();
                 message.push(next_char);
                 message.push('\'');
-                util::error(self.line, &message)
+                self.add_error(self.line, &message)
             }
         }
+    }
+
+    fn string(&mut self) {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            let _ = self.advance();
+        }
+        if self.is_at_end() {
+            self.add_error(self.line, &"Unterminated string".to_owned());
+            return;
+        }
+
+        // Last " char
+        let _ = self.advance();
+
+        let string_start = self.start + 1;
+        let string_end = self.current - 1;
+        let string_lexeme = self
+            .original_text
+            .chars()
+            .skip(string_start)
+            .take(string_end - string_start)
+            .collect();
+        self.add_simple_token(TokenType::String(string_lexeme));
     }
 
     fn peek(&mut self) -> char {
@@ -143,6 +166,20 @@ impl Scanner {
             .take(self.current - self.start)
             .collect();
         self.tokens
-            .push(Token::new_simple_token(token_type, &text, self.line));
+            .push(Ok(Token::new(token_type, &text, self.line)));
+    }
+
+    fn add_error(&mut self, line: usize, message: &String) {
+        self.add_report(line, &"".to_owned(), message);
+    }
+
+    fn add_report(&mut self, line: usize, where_at: &String, message: &String) {
+        let mut output = "[line ".to_owned();
+        output.push_str(&line.to_string());
+        output.push_str(&"] Error".to_owned());
+        output.push_str(where_at);
+        output.push_str(&": ".to_owned());
+        output.push_str(message);
+        self.tokens.push(Err(output));
     }
 }

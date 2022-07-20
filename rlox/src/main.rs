@@ -41,17 +41,14 @@ fn run_prompt() {
     }
 }
 
-// fn report(line:i32, )
-
-// fn error(line: i32, message: &String) {
-//     report(line, "".to_owned(), message);
-// }
-
 fn run(input: &String) {
     let mut scanner: Scanner = Scanner::new(input);
 
-    let tokens: &Vec<Token> = scanner.scan_tokens();
-    for token in tokens {
-        println!("{:?}", token);
+    let token_results: &Vec<Result<Token, String>> = scanner.scan_tokens();
+    for token_result in token_results {
+        match token_result {
+            Ok(token) => println!("{:?}", token),
+            Err(message) => println!("Error: {}", message),
+        }
     }
 }

@@ -1,5 +1,5 @@
 use core::fmt::Debug;
-use std::boxed::Box;
+// use std::boxed::Box;
 
 #[derive(Debug)]
 pub enum TokenType {
@@ -26,7 +26,7 @@ pub enum TokenType {
     LessEqual,
     // Literals
     Identifier,
-    String,
+    String(String),
     Number,
     // Keywords
     And,
@@ -57,7 +57,7 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new_simple_token(token_type: TokenType, lexeme: &String, line: usize) -> Token {
+    pub fn new(token_type: TokenType, lexeme: &String, line: usize) -> Token {
         Token {
             token_type: token_type,
             lexeme: lexeme.clone(),
