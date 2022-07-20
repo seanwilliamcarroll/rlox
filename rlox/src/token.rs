@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 // use std::boxed::Box;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     // Single Character Tokens
     LeftParen,
@@ -25,9 +25,9 @@ pub enum TokenType {
     Less,
     LessEqual,
     // Literals
-    Identifier,
+    Identifier(String),
     String(String),
-    Number,
+    Number(f32),
     // Keywords
     And,
     Class,
