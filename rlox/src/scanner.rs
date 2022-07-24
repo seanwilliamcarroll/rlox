@@ -62,7 +62,6 @@ impl Scanner {
 
     fn scan_token(&mut self) {
         let next_char = self.advance();
-
         match next_char {
             '(' => self.add_simple_token(TokenType::LeftParen),
             ')' => self.add_simple_token(TokenType::RightParen),

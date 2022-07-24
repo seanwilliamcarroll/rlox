@@ -1,3 +1,5 @@
+use crate::ast_printer::AstPrinter;
+use crate::expr::{Expr, LiteralType};
 use crate::scanner::Scanner;
 use crate::token::Token;
 use std::env;
@@ -5,6 +7,8 @@ use std::fs;
 use std::io;
 use std::io::Write;
 use std::process;
+pub mod ast_printer;
+pub mod expr;
 pub mod scanner;
 pub mod token;
 
@@ -50,4 +54,7 @@ fn run(input: &String) {
             Err(message) => println!("Error: {}", message),
         }
     }
+
+    let my_ast_printer = AstPrinter;
+    my_ast_printer.print(Expr::Literal(LiteralType::Number(0.0)));
 }
