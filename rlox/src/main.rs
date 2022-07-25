@@ -1,7 +1,7 @@
 use crate::ast_printer::AstPrinter;
 use crate::expr::{Expr, LiteralType};
 use crate::scanner::Scanner;
-use crate::token::Token;
+use crate::token::{Token, TokenType};
 use std::env;
 use std::fs;
 use std::io;
@@ -56,5 +56,9 @@ fn run(input: &String) {
     }
 
     let my_ast_printer = AstPrinter;
-    my_ast_printer.print(Expr::Literal(LiteralType::Number(0.0)));
+    my_ast_printer.print(Expr::Binary(
+        Box::new(Expr::Literal(LiteralType::Number(0.0))),
+        Token::new(TokenType::Plus, &String::from("+"), 1),
+        Box::new(Expr::Literal(LiteralType::Number(0.0))),
+    ));
 }
